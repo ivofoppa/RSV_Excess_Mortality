@@ -1,8 +1,9 @@
 #### Creating National data set 2010-16; for five age groups
 ### Ivo M. Foppa, 8/2018
-
+#########################################################################################
+#########################################################################################
 ### The directory containing all datasets has to be defined here:
-bfolder <- "C:/Users/vor1/Dropbox/Misc work/RSV/RSV git project" ## project folder
+bfolder <- "C:/Users/vor1/Dropbox/Misc work/RSV/RSV git project/" ## project folder
 setwd(paste0(bfolder,'RSVdata'))
 #########################################################################################
 ###  VERY IMPORTANT: Global parameters have to be set here:   ###########################
@@ -193,8 +194,6 @@ rsvpos <- rsvdat$RSVpos
 #########################################################################################
 ###  ILInet data  #######################################################################
 #########################################################################################
-ILIdat <- uniquecombs(ILIdat[ILIselind,])
-
 total <- as.numeric(as.vector(ILIdat$total))
 ILI <- as.numeric(as.vector(ILIdat$ilitot))
 ILIperc <- ILI / total
@@ -282,10 +281,10 @@ for (wk in DVDun){
     selindwk1 <- which(mortdat$DVD==wk&mortdat$agecat==ag)
     mortdatwk <- mortdat[selindwk1,]
     
-    rcuel <- mortdatHHSwk$rcu
-    piel <- mortdatHHSwk$pi
-    allcauseel <- mortdatHHSwk$allcause
-    fluel <- mortdatHHSwk$flu
+    rcuel <- mortdatwk$rcu
+    piel <- mortdatwk$pi
+    allcauseel <- mortdatwk$allcause
+    fluel <- mortdatwk$flu
     
     rcu <- c(rcu,rcuel); pi <- c(pi,piel); 
     flu <- c(flu,fluel); allcause <- c(allcause,allcauseel); 
@@ -293,10 +292,10 @@ for (wk in DVDun){
   }
   DVD <- c(DVD,rep(wk,nag)); 
   pop <- c(pop,popwk); 
-  AH1P <- c(AH1P,rep(virdatHHSwk$AH1P,nag)); 
-  AH3 <- c(AH3,rep(virdatHHSwk$AH3,nag)); 
-  B <- c(B,rep(virdatHHSwk$B,nag)); 
-  RSV <- c(RSV,rep(virdatHHSwk$RSV,nag))
+  AH1P <- c(AH1P,rep(virdatwk$AH1P,nag)); 
+  AH3 <- c(AH3,rep(virdatwk$AH3,nag)); 
+  B <- c(B,rep(virdatwk$B,nag)); 
+  RSV <- c(RSV,rep(virdatwk$RSV,nag))
 }
 
 
@@ -305,6 +304,6 @@ datcoll <- data.frame(DVD,age,rcu,pi,flu,allcause,pop,AH1P,AH3,B,RSV)
 ###########################################################################################################
 filename <- paste("data_National_2010_16_5ag",".dat",sep = "")
 
-setwd(paste(bfolder,"RSVdata",sep = ""))
+setwd(paste0(bfolder,"RSVdata"))
 write.table(datcoll,file = filename,row.names = F,col.names = T,quote = F,sep = "\t")
 
