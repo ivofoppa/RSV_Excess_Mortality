@@ -1,0 +1,52 @@
+model {
+  for(l in 1:2){
+    flumort[l] ~ dpois(sigma[l]*pop[l])
+  }
+  
+  for(k in 3:N) {
+    lambdaBase[k] <- b0 + inprod(b,ns[k,])
+    lambdaB[k] <- b0 + inprod(b,ns[k,])  + sigma[k]*b10 + sigma[k-1]*b11 + sigma[k-2]*b12
+    muB[k] <- lambdaB[k]*r[k-2]*pop[k]
+    muB0[k] <- lambdaB[k]*pop[k]
+    muBase0[k] <- lambdaBase[k]*pop[k]
+   
+    lambdaRSV[k] <- RSV[k]*b20 + RSV[k-1]*b21 + RSV[k-2]*b22
+    
+    EMRSV[k] <- lambdaRSV[k]*r[k-2]*pop[k]
+    EMflu[k] <- lambdaRSV[k]*r[k-2]*pop[k]
+    
+    mu0[k] <- (lambdaB[k] + lambdaRSV[k])*pop[k]
+    
+    mu[k] <- muB[k] + EMRSV[k]
+    r[k-2] ~ dgamma(alpha,alpha)
+    
+    y[k] ~ dpois(mu[k])
+    flumort[k] ~ dpois(sigma[k]*pop[k])
+
+  }	 
+  
+  b0~dnorm(0,1.0E-6)I(0,)
+  
+  b10~dnorm(0,1.0E-6)
+  b11~dnorm(0,1.0E-6)
+  b12~dnorm(0,1.0E-6)
+  
+  b20~dnorm(0,1.0E-6)
+  b21~dnorm(0,1.0E-6)
+  b22~dnorm(0,1.0E-6)
+  
+  logalpha~dnorm(0,1.0E-6)
+  alpha <- exp(logalpha)
+  
+  for (m in 1:ndf){b[m]~dnorm(0,1.0E-6)}  
+  for (n in 1:N){sigma[n] ~ dunif(0,1)}  
+  
+  EMRSV1tot <- sum(EMRSV[seas1[1]:seas1[2]])
+  EMRSV2tot <- sum(EMRSV[seas2[1]:seas2[2]])
+  EMRSV3tot <- sum(EMRSV[seas3[1]:seas3[2]])
+  EMRSV4tot <- sum(EMRSV[seas4[1]:seas4[2]])
+  EMRSV5tot <- sum(EMRSV[seas5[1]:seas5[2]])
+  EMRSV6tot <- sum(EMRSV[seas6[1]:seas6[2]])
+  
+  EMRSVtot <- sum(EMRSV[3:N])
+}

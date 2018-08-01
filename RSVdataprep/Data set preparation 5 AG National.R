@@ -277,14 +277,13 @@ for (wk in DVDun){
   popwk <- popag[selindwk3,]
   
   for (ag in 1:nag){
-    
     selindwk1 <- which(mortdat$DVD==wk&mortdat$agecat==ag)
     mortdatwk <- mortdat[selindwk1,]
     
-    rcuel <- mortdatwk$rcu
-    piel <- mortdatwk$pi
-    allcauseel <- mortdatwk$allcause
-    fluel <- mortdatwk$flu
+    rcuel <- sum(mortdatwk$rcu)
+    piel <- sum(mortdatwk$pi)
+    allcauseel <- sum(mortdatwk$allcause)
+    fluel <- sum(mortdatwk$flu)
     
     rcu <- c(rcu,rcuel); pi <- c(pi,piel); 
     flu <- c(flu,fluel); allcause <- c(allcause,allcauseel); 
