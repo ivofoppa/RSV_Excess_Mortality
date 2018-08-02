@@ -1,0 +1,113 @@
+\documentclass[landscape]{article}
+\usepackage[letterpaper, margin=1.in]{geometry}
+\begin{document}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+  concordance=TRUE
+)
+@
+
+
+<<chunk1, echo=FALSE>>=
+bfolder <- "C:/Users/vor1/Dropbox/Misc work/RSV/RSV git project/"
+setwd(paste0(bfolder,'RSVMCMCoutput'))
+niter <- 5000
+nadapt <- 1000
+#
+nknots <- 4
+# qual <- 'vir'
+for (qual in c('flumort','vir')){
+  for (ag in 1:5){
+    fname <- paste0('codaarr',ag,' RSV ',qual,' ',nknots,' knots ps ',nadapt,' ',round(niter/5*3),'.RData')
+    load(fname)
+    for (k in 1:14){
+      assign(paste0('el',k), round(as.vector(quantile(codaarr[,k],prob=c(.5,.05,0.975)))))
+    }
+    assign(paste0('RSV_',qual,'_',ag), paste0(ag,' & ',el1[1],' (',el1[2],',',el1[3],') & ',
+                                              el2[1],' (',el2[2],',',el2[3],') & ',
+                                              el3[1],' (',el3[2],',',el3[3],') & ',
+                                              el4[1],' (',el4[2],',',el4[3],') & ',
+                                              el5[1],' (',el5[2],',',el5[3],') & ',
+                                              el6[1],' (',el6[2],',',el6[3],') & ',
+                                              el7[1],' (',el7[2],',',el7[3],') \\\\'))
+    
+    assign(paste0('flu_',qual,'_',ag), paste0(ag,' & ',el8[1],' (',el8[2],',',el8[3],') & ',
+                                              el9[1],' (',el9[2],',',el9[3],') & ',
+                                              el10[1],' (',el10[2],',',el10[3],') & ',
+                                              el11[1],' (',el11[2],',',el11[3],') & ',
+                                              el12[1],' (',el12[2],',',el12[3],') & ',
+                                              el13[1],' (',el13[2],',',el13[3],') & ',
+                                              el14[1],' (',el14[2],',',el14[3],') \\\\'))
+  }
+}
+@
+Excess mortality, using coded influenza mortality as influenza indicator\Sexpr{qual <- 'flumort'}.
+\begin{itemize}
+\Sexpr{outc <- 'RSV'}
+\item[\Sexpr{outc}]
+\begin{table}[ht]
+\begin{tabular}{cccccccc}
+age & 2010-11 & 2011-12 & 2012-13 & 2013-14 & 2014-15 & 2015-16 & Total\\
+\hline
+<<results='asis',echo = FALSE>>=
+for (ag in 1:5){
+  cat(paste0(eval(parse(text = paste0(outc,'_',qual,'_',ag))),'\n'))
+}
+@
+\hline
+\end{tabular}
+\end{table}
+
+\Sexpr{outc <- 'flu'}
+\item[\Sexpr{outc}]
+\begin{table}[ht]
+\begin{tabular}{cccccccc}
+age & 2010-11 & 2011-12 & 2012-13 & 2013-14 & 2014-15 & 2015-16 & Total\\
+\hline
+<<results='asis',echo = FALSE>>=
+for (ag in 1:5){
+  cat(paste0(eval(parse(text = paste0(outc,'_',qual,'_',ag))),'\n'))
+}
+@
+\hline
+\end{tabular}
+\end{table}
+\end{itemize}
+\clearpage
+Excess mortality, using coded ``Goldstein'' indicators\Sexpr{qual <- 'vir'}.
+
+\begin{itemize}
+\Sexpr{outc <- 'RSV'}
+\item[\Sexpr{outc}]
+\begin{table}[ht]
+\begin{tabular}{cccccccc}
+age & 2010-11 & 2011-12 & 2012-13 & 2013-14 & 2014-15 & 2015-16 & Total\\
+\hline
+<<results='asis',echo = FALSE>>=
+for (ag in 1:5){
+  cat(paste0(eval(parse(text = paste0(outc,'_',qual,'_',ag))),'\n'))
+}
+@
+\hline
+\end{tabular}
+\end{table}
+
+\Sexpr{outc <- 'flu'}
+\item[\Sexpr{outc}]
+\begin{table}[ht]
+\begin{tabular}{cccccccc}
+age & 2010-11 & 2011-12 & 2012-13 & 2013-14 & 2014-15 & 2015-16 & Total\\
+\hline
+<<results='asis',echo = FALSE>>=
+for (ag in 1:5){
+  cat(paste0(eval(parse(text = paste0(outc,'_',qual,'_',ag))),'\n'))
+}
+@
+\hline
+\end{tabular}
+\end{table}
+\end{itemize}
+
+\end{document}
