@@ -47,7 +47,7 @@ qual1 <- 'flumort'
 model1.file <- paste0('model NS ',qual1,'.txt')
 ag <- 5
 ###################################################################################################
-for (ag in rev(1:5)){
+for (ag in rev(1:3)){
   agdata <- datarr[which(datarr$age==ag),]
   RSV <- agdata$RSV
   flumort <- agdata$flu
