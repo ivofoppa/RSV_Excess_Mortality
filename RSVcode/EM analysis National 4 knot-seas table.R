@@ -46,8 +46,9 @@ datarr <- data.frame(read.table(file = filename,header = T))
 qual1 <- 'flumort'
 model1.file <- paste0('model NS ',qual1,'.txt')
 ag <- 5
+nknots <- 4
 ###################################################################################################
-for (ag in rev(1:3)){
+for (ag in rev(4:5)){
   agdata <- datarr[which(datarr$age==ag),]
   RSV <- agdata$RSV
   flumort <- agdata$flu
@@ -60,8 +61,6 @@ for (ag in rev(1:3)){
   ###################################################################################################
   variables7 <- c('EMRSV1tot','EMRSV2tot','EMRSV3tot','EMRSV4tot','EMRSV5tot','EMRSV6tot','EMRSVtot',
                   'EMflu1tot','EMflu2tot','EMflu3tot','EMflu4tot','EMflu5tot','EMflu6tot','EMflutot')
-  
-  nknots <- 4
   #######################################################################################
   ###################################################################################################
   ndf <- round((nknots + 1) * nseas/(nseas*52.5)*N)
@@ -123,9 +122,27 @@ qual2 <- 'vir'
 model2.file <- paste0('model NS ',qual2,'.txt')
 #######################################################################################
 for (ag in rev(1:5)){
+  agdata <- datarr[which(datarr$age==ag),]
+  RSV <- agdata$RSV
+  mort <- agdata$rcu
+  N <- length(mort)
+  pop <- agdata$pop
+  
+  N <- length(mort)
+  time <- (1:N)/N
+  
   AH1P <- agdata$AH1P
   AH3 <- agdata$AH3
   B <- agdata$B
+  
+  ndf <- round((nknots + 1) * nseas/(nseas*52.5)*N)
+  nsarr <- ns(time,df = ndf)[,]  ## defining basis matrix
+  #######################################################################################
+  mod <- lm(mort ~ ns(time, df = ndf))
+  smod <- summary(mod)
+  coeffls <- as.numeric(smod$coefficients[,1])/mean(pop)
+  nsinit <- coeffls[2:(ndf + 1)]
+  b0init <- coeffls[1]
   ###################################################################################################
   data <- list('N'=N,'ndf'=ndf,'ns'=nsarr,'y'=mort,'RSV'=RSV,'pop'=pop, 
                'AH1P'=AH1P,'AH3'=AH3,'B'=B, 
@@ -173,36 +190,5 @@ for (ag in rev(1:5)){
   
   cat(paste0('\nAge group ',ag,': done\n'))
 }
-
-
 ###################################################################################################
-###################################################################################################
-setwd(paste0(bfolder1,'RSVresults'))
-
-for (k in 1:7){
-  assign(paste('el',k,sep = ''), round(as.vector(quantile(codaarr[,k],prob=c(.5,.05,0.975)))))
-}
-newline <- paste0('Influenza viral indicator\t',el1[1],' (',el1[2],',',el1[3],')\t',
-                  el2[1],' (',el2[2],',',el2[3],')\t',
-                  el3[1],' (',el3[2],',',el3[3],')\t',
-                  el4[1],' (',el4[2],',',el4[3],')\t',
-                  el5[1],' (',el5[2],',',el5[3],')\t',
-                  el6[1],' (',el6[2],',',el6[3],')\t',
-                  el7[1],' (',el7[2],',',el7[3],')')
-
-write.table(newline,outfile,append=T,row.names=FALSE,col.names=FALSE, quote=FALSE)
-###################################################################################################
-plot(RSV,type = 'l',lwd = 2,xlab = 'Index Week')
-lines(AH3/max(AH3)*max(RSV)*0.8,col = 'red',lwd = 2)
-lines(flumort/max(flumort)*max(RSV)*0.8,col = 'blue',lwd = 2)
-par(mar=c(0,0,0,0))
-
-legend('topleft',c('RSV','Influenza A(H3N2'), col = c('black','red'), lwd = 2,y.intersp = .8,bty = 'n')
-###################################################################################################plot(RSV,type = 'l',lwd = 2,xlab = 'Index Week')
-plot(mort,type = 'l',lwd = 2,xlab = 'Index Week',ylim = c(0,max(mort)))
-lines(RSV/max(RSV)*max(mort)*0.8,col = 'red',lwd = 2)
-lines(flumort/max(flumort)*max(mort)*0.8,col = 'blue',lwd = 2)
-par(mar=c(0,0,0,0))
-
-legend('topleft',c('R&C mortality','RSV','Influenza mort.'), col = c('black','red','blue'), lwd = 2,y.intersp = .8,bty = 'n')
 ###################################################################################################
