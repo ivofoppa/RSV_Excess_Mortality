@@ -1,7 +1,6 @@
-bfolder <- "C:/Users/vor1/Dropbox/Misc work/RSV/RSV git project/" ## project folder
 setwd(paste0(bfolder,'RSVdata'))
 
-censdat <- data.frame(read.csv("sc-est2016-alldata.csv", header = T))
+censdat <- data.frame(read.csv(censdatafile, header = T))
 
 st_list <- list(c('Connecticut','Maine','Massachusetts','New Hampshire','Rhode Island','Vermont'),
                 c('New Jersey','New York','Puerto Rico','The Virgin Islands'), 

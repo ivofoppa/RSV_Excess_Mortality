@@ -2,7 +2,6 @@
 ### Ivo M. Foppa, 8/2018
 
 ### The directory containing all datasets has to be defined here:
-bfolder <- "C:/Users/vor1/Dropbox/Misc work/RSV/RSV git project" ## project folder
 setwd(paste0(bfolder,'RSVdata'))
 #########################################################################################
 ###  VERY IMPORTANT: Global parameters have to be set here:   ###########################
