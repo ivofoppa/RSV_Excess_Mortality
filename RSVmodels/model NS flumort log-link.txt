@@ -1,0 +1,47 @@
+model {
+
+  for(k in 3:N) {
+    log(lambda[k]) <- b0 + inprod(b,ns[k,]) + RSV[k]*b20 + RSV[k-1]*b21 + RSV[k-2]*b22 + flumort[k]*b10 + flumort[k-1]*b11 + flumort[k-2]*b12
+    
+    log(lambdaflu[k]) <- b0 + inprod(b,ns[k,]) + RSV[k]*b20 + RSV[k-1]*b21 + RSV[k-2]*b22
+    
+    log(lambdaRSV[k]) <- b0 + inprod(b,ns[k,]) + flumort[k]*b10 + flumort[k-1]*b11 + flumort[k-2]*b12
+    
+    EMRSV[k] <- y[k] - lambdaRSV[k]*pop[k] 
+    EMflu[k] <- y[k] - lambdaflu[k]*pop[k] + flumort[k]
+    
+    mu[k] <- lambda[k]*pop[k]
+
+    y[k] ~ dpois(mu[k])
+  }	 
+  
+  b0~dnorm(0,1.0E-6)
+  
+  b10~dnorm(0,1.0E-6)
+  b11~dnorm(0,1.0E-6)
+  b12~dnorm(0,1.0E-6)
+  
+  b20~dnorm(0,1.0E-6)
+  b21~dnorm(0,1.0E-6)
+  b22~dnorm(0,1.0E-6)
+  
+  for (k in 1:ndf){b[k]~dnorm(0,1.0E-6)}  
+
+  EMRSV1tot <- sum(EMRSV[seas1[1]:seas1[2]])
+  EMRSV2tot <- sum(EMRSV[seas2[1]:seas2[2]])
+  EMRSV3tot <- sum(EMRSV[seas3[1]:seas3[2]])
+  EMRSV4tot <- sum(EMRSV[seas4[1]:seas4[2]])
+  EMRSV5tot <- sum(EMRSV[seas5[1]:seas5[2]])
+  EMRSV6tot <- sum(EMRSV[seas6[1]:seas6[2]])
+  
+  EMRSVtot <- sum(EMRSV[3:N])
+  
+  EMflu1tot <- sum(EMflu[seas1[1]:seas1[2]])
+  EMflu2tot <- sum(EMflu[seas2[1]:seas2[2]])
+  EMflu3tot <- sum(EMflu[seas3[1]:seas3[2]])
+  EMflu4tot <- sum(EMflu[seas4[1]:seas4[2]])
+  EMflu5tot <- sum(EMflu[seas5[1]:seas5[2]])
+  EMflu6tot <- sum(EMflu[seas6[1]:seas6[2]])
+  
+  EMflutot <- sum(EMflu[3:N])
+}

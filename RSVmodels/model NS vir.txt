@@ -1,0 +1,66 @@
+model {
+  for(k in 3:N) {
+    lambdaBase[k] <- b0 + inprod(b,ns[k,])
+    lambdaB[k] <- b0 + inprod(b,ns[k,]) + AH1P[k]*b30 + AH3[k]*b40 + B[k]*b50 +
+      AH1P[k-1]*b31 + AH3[k-1]*b41 + B[k-1]*b51 +
+      AH1P[k-2]*b32 + AH3[k-2]*b42 + B[k-2]*b52
+    muB[k] <- lambdaB[k]*r[k-2]*pop[k]
+    muB0[k] <- lambdaB[k]*pop[k]
+    muBase0[k] <- lambdaBase[k]*pop[k]
+    
+    lambdaRSV[k] <- RSV[k]*b70 + RSV[k-1]*b71 + RSV[k-2]*b72
+    lambdaflu[k] <- AH1P[k]*b30 + AH3[k]*b40 + B[k]*b50 +
+      AH1P[k-1]*b31 + AH3[k-1]*b41 + B[k-1]*b51 +
+      AH1P[k-2]*b32 + AH3[k-2]*b42 + B[k-2]*b52
+    
+    EMRSV[k] <- lambdaRSV[k]*r[k-2]*pop[k]
+    
+    EMflu[k] <- lambdaflu[k]*r[k-2]*pop[k]
+    
+    mu[k] <- muB[k] + EMRSV[k]
+    r[k-2] ~ dgamma(alpha,alpha)
+    
+    y[k] ~ dpois(mu[k])
+  }	 
+  
+  b0~dnorm(0,1.0E-6)I(0,)
+  
+  b30~dnorm(0,1.0E-6)
+  b31~dnorm(0,1.0E-6)
+  b32~dnorm(0,1.0E-6)
+  
+  b40~dnorm(0,1.0E-6)
+  b41~dnorm(0,1.0E-6)
+  b42~dnorm(0,1.0E-6)
+  
+  b50~dnorm(0,1.0E-6)
+  b51~dnorm(0,1.0E-6)
+  b52~dnorm(0,1.0E-6)
+  
+  b70~dnorm(0,1.0E-6)
+  b71~dnorm(0,1.0E-6)
+  b72~dnorm(0,1.0E-6)
+  
+  logalpha~dnorm(0,1.0E-6)
+  alpha <- exp(logalpha)
+    
+  for (k in 1:ndf){b[k]~dnorm(0,1.0E-6)}  
+  
+  EMRSV1tot <- sum(EMRSV[seas1[1]:seas1[2]])
+  EMRSV2tot <- sum(EMRSV[seas2[1]:seas2[2]])
+  EMRSV3tot <- sum(EMRSV[seas3[1]:seas3[2]])
+  EMRSV4tot <- sum(EMRSV[seas4[1]:seas4[2]])
+  EMRSV5tot <- sum(EMRSV[seas5[1]:seas5[2]])
+  EMRSV6tot <- sum(EMRSV[seas6[1]:seas6[2]])
+  
+  EMRSVtot <- sum(EMRSV[3:N])
+
+  EMflu1tot <- sum(EMflu[seas1[1]:seas1[2]])
+  EMflu2tot <- sum(EMflu[seas2[1]:seas2[2]])
+  EMflu3tot <- sum(EMflu[seas3[1]:seas3[2]])
+  EMflu4tot <- sum(EMflu[seas4[1]:seas4[2]])
+  EMflu5tot <- sum(EMflu[seas5[1]:seas5[2]])
+  EMflu6tot <- sum(EMflu[seas6[1]:seas6[2]])
+  
+  EMflutot <- sum(EMflu[3:N])
+}
