@@ -1,21 +1,26 @@
-library(splines)
 ###############################################################################
 ###############################################################################
 ###  Ivo M. Foppa, Aug 2018---National RSV excess mort. analysis          #####
 ###############################################################################
+###  Run the next two lines if just opened project                        #####
+# setwd('./RSVcode')
+# source('Set_environmental_variables.R')
 ###############################################################################
-setwd(paste0(bfolder,'RSVData'))
-###############################################################################
-###################################################################################################
-###################################################################################################
-setwd(paste0(bfolder,'RSVData'))
-datarr <- data.frame(read.table(file = filename,header = T))
+setwd('..')
+setwd('./RSVMCMCoutput')
+
+fname <- paste0('codaarr',ag,' RSV ',qual3,' ',nknots,' knots ps ',nadapt,' ',round(niter/5*3),'.RData')
+load(fname)
+codaarr <- data.frame(codaarr)
 ###################################################################################################
 ###################################################################################################
 ###  NS, flu mort indicator #######################################################################
 ###################################################################################################
 ag <- 5
 agls <- c('<5','5-17','18-49','50-64','65+','All')
+
+allseas <- c(seas1[1]:seas1[2],seas2[1]:seas2[2],seas3[1]:seas3[2],seas4[1]:seas4[2],seas5[1]:seas5[2],seas6[1]:seas6[2])
+
 ###################################################################################################
 for (ag in rev(1:5)){
   agdata <- datarr[which(datarr$age==ag),]
@@ -33,27 +38,27 @@ for (ag in rev(1:5)){
   pop <- agdata$pop[-c(1:2)]
   
   N <- length(mort)
-  time <- (1:N)/N
+  time <- (1:(N + 2))/(N + 2)
   #######################################################################################
   ###################################################################################################
-  ndf <- round((nknots + 1) * nseas/(nseas*52.5)*N)
+  ndf <- round((nknots + 1) * nseas/(nseas*52.5)*(N+2))
+  nsarr <- ns(time,df = ndf)[3:(N + 2),]  ## defining basis matrix
   ### using basis matrix from Bayesian analysis
-  nsarr1 <- nsarr[1:length(mort),]
   #######################################################################################
-  data <- data.frame(mort,time=time,flumort0,flumort1,flumort2,RSV0,RSV1,RSV2,pop,nsarr1)
+  data <- data.frame(mort,time=time[-c(1,2)],flumort0,flumort1,flumort2,RSV0,RSV1,RSV2,pop,nsarr)
 
-  mod <- glm(mort ~ ns(time,df=ndf) + flumort0 + flumort1 + flumort2 + RSV0 + RSV1 + RSV2 + offset(log(pop)),
+  mod <- glm(mort ~ nsarr + flumort0 + flumort1 + flumort2 + RSV0 + RSV1 + RSV2 + offset(log(pop)),
              data = data,family = poisson(link = 'log'))
  
   dataRSV0 <- data.frame(mort,time,flumort0,flumort1,flumort2,
-                         RSV0=RSV0*0,RSV1=RSV1*0,RSV2=RSV2*0,pop,nsarr1)
+                         RSV0=RSV0*0,RSV1=RSV1*0,RSV2=RSV2*0,pop,nsarr)
   dataflu0 <- data.frame(mort,time,flumort0=flumort0*0,flumort1=flumort1*0,flumort2=flumort2*0,
-                         RSV0,RSV1,RSV2,pop,nsarr1)
+                         RSV0,RSV1,RSV2,pop,nsarr)
   
-  mort1 <- predict(mod, type = 'response')
-  mortRSV0 <- predict(mod, newdata = dataRSV0, type = 'response')
-  mortflu0 <- predict(mod, newdata = dataflu0, type = 'response')
-  cat(paste0(agls[ag],':\tRSV: ',round(sum(mort-mortRSV0)),'\t Flu: ', round(sum(mort + flumort[-c(1:2)]-mortflu0)),'\n'))
+  mort1 <- predict(mod, type = 'response')[allseas]
+  mortRSV0 <- predict(mod, newdata = dataRSV0, type = 'response')[allseas]
+  mortflu0 <- predict(mod, newdata = dataflu0, type = 'response')[allseas]
+  cat(paste0(agls[ag],':\tRSV: ',round(sum(mort1 - mortRSV0)),'\t Flu: ', round(sum(mort1 + flumort[-c(1:2)][allseas] - mortflu0)),'\n'))
 }
 ###################################################################################################
 ###################################################################################################

@@ -1,13 +1,13 @@
-###################################################################################################
-### Set directory path here ... remember to use forward slashes ... ###############################
-###################################################################################################
-bfolder <- "C:/Users/VOR1/Documents/Git projects/RSV_Excess_Mortality/"  #this is an example ...
-
-#bfolder <- "C:/Users/.../.../" ### put "/" at the end
+library(splines)
+library(R2jags)
 ###################################################################################################
 ###  Define censdatafile (census data file) and filename (name of analysis file to be created)#####
 ###################################################################################################
 filename <- paste0('data_National_2010_16_5ag.dat')
+setwd('..')
+setwd("./RSVdata")
+
+datarr <- read.table(file = filename, header = T)
 ###################################################################################################
 ###  Now we are defining all time variables; make sure mmrweeks is present ########################
 ###################################################################################################
@@ -19,8 +19,6 @@ towk <- 52
 
 nseas <- toyr - fromyr
 ### Define 'global N'
-
-setwd(paste0(bfolder,'RSVData'))
 
 mmwrdat<-read.table("mmwrweeks.txt",header=T)
 mmwrdat<-mmwrdat[which((mmwrdat$wyear==fromyr&mmwrdat$week>=fromwk)|(mmwrdat$wyear>fromyr&mmwrdat$wyear<toyr)|(mmwrdat$wyear==toyr&mmwrdat$week<=towk)),]

@@ -34,7 +34,7 @@ model {
   EMRSV5tot <- sum(EMRSV[seas5[1]:seas5[2]])
   EMRSV6tot <- sum(EMRSV[seas6[1]:seas6[2]])
   
-  EMRSVtot <- sum(EMRSV[3:N])
+  EMRSVtot <- EMRSV1tot + EMRSV2tot + EMRSV3tot + EMRSV4tot + EMRSV5tot + EMRSV6tot
   
   EMflu1tot <- sum(EMflu[seas1[1]:seas1[2]])
   EMflu2tot <- sum(EMflu[seas2[1]:seas2[2]])
@@ -43,5 +43,5 @@ model {
   EMflu5tot <- sum(EMflu[seas5[1]:seas5[2]])
   EMflu6tot <- sum(EMflu[seas6[1]:seas6[2]])
   
-  EMflutot <- sum(EMflu[3:N])
+  EMflutot <- EMflu1tot + EMflu2tot + EMflu3tot + EMflu4tot + EMflu5tot + EMflu6tot
 }
