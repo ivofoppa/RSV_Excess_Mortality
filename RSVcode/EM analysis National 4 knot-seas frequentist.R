@@ -50,15 +50,16 @@ for (ag in rev(1:5)){
   mod <- glm(mort ~ nsarr + flumort0 + flumort1 + flumort2 + RSV0 + RSV1 + RSV2 + offset(log(pop)),
              data = data,family = poisson(link = 'log'))
  
-  dataRSV0 <- data.frame(mort,time,flumort0,flumort1,flumort2,
+  dataRSV0 <- data.frame(mort,time[-c(1,2)],flumort0,flumort1,flumort2,
                          RSV0=RSV0*0,RSV1=RSV1*0,RSV2=RSV2*0,pop,nsarr)
-  dataflu0 <- data.frame(mort,time,flumort0=flumort0*0,flumort1=flumort1*0,flumort2=flumort2*0,
+  
+  dataflu0 <- data.frame(mort,time[-c(1,2)],flumort0=flumort0*0,flumort1=flumort1*0,flumort2=flumort2*0,
                          RSV0,RSV1,RSV2,pop,nsarr)
   
-  mort1 <- predict(mod, type = 'response')[allseas]
+  # mort1 <- predict(mod, type = 'response')[allseas]
   mortRSV0 <- predict(mod, newdata = dataRSV0, type = 'response')[allseas]
   mortflu0 <- predict(mod, newdata = dataflu0, type = 'response')[allseas]
-  cat(paste0(agls[ag],':\tRSV: ',round(sum(mort1 - mortRSV0)),'\t Flu: ', round(sum(mort1 + flumort[-c(1:2)][allseas] - mortflu0)),'\n'))
+  cat(paste0(agls[ag],':\tRSV: ',round(sum(mort[allseas] - mortRSV0)),'\t Flu: ', round(sum(mort[allseas] + flumort[-c(1:2)][allseas] - mortflu0)),'\n'))
 }
 ###################################################################################################
 ###################################################################################################

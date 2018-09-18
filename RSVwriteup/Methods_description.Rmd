@@ -1,0 +1,70 @@
+---
+title: "Description of Methods and Issues of RSV Excess Mortality Estimation"
+output: pdf_document
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Goals
+This is a summary of the methods used for influenza excess mortality estimation using mortality data; these methods were originally also proposed for use in excess mortality estimations for RSV. 
+
+## Excess mortality estimation
+
+*Excess mortality estimation* represents a suite methods/statistical models that may be described as *ecological* as the unit of analysis is not *individuals*, but *population group-weeks*. The population groups can be certain age groups, typically <5, 5-17, 18-49, 50-64, 65+, nationally or by HHS region.
+
+### Serfling-type model for excess mortality due to influenza
+
+Traditionally, weekly influenza excess mortality was estimating using the following model:
+
+\begin{eqnarray}
+\label{eq:mod_trad}
+\log \mu_k &=& \beta_0 + \beta_1 w_k  + \beta_2 w_k^2  + \beta_3 w_k^3  + \beta_4 \sin t_k  + \beta_5 \cos t_k + 
+\beta_6 v_{A(H1)} + \beta_7 v_{A(H3)}  + \beta_8 v_{B}\\
+\label{eq:dist1}
+y_k &\sim& \operatorname{Poi}(\mu_k \; N_k)
+\end{eqnarray}
+where $t_k = \frac{w_k \; 2\pi}{52.25}$, with $w_k$ being the index week, and $v_{A(H1)pdm}$,$v_{A(H3)}$ and $v_B$ are the viral surveillance indicators for influenza, typically the percent of samples tested with positive test results for influenza A(H3N2), A(H1N1)pdm09 and B, respectively, $y_k$ is the number of deaths (e.g. respiratory and circulatory deaths, usually by age group) in week $k$ and $N_k$ is the population denominator.  In R, this model could be implemented as follows.  We look at data over six influenza seasons; the influenza indicators are actually the proportion positive multiplied by the ILI\%.  This type of indicator is sometimes referred to as Goldstein indicator (see @goldstein2011predicting): 
+
+```{r echo=T,eval=T}
+filename <- 'data_National_2010_16_5ag.dat'
+setwd('../') ## change to root directory
+setwd('./RSVdata')
+datarr <- data.frame(read.table(file = filename,header = T))
+##########################################################################################
+###  Serfling-type model, virologic indicators (Thompson et al., 2009)  ##################
+##########################################################################################
+ag <- 5 ### Setting age group to 65+
+agdata <- datarr[which(datarr$age==ag),]
+
+AH1P <- agdata$AH1P
+AH3 <- agdata$AH3
+B <- agdata$B
+
+mort <- agdata$rcu
+pop <- agdata$pop
+
+N <- length(mort)
+time <- (1:N)/N
+t <- time * N * 2* pi/52.25
+##########################################################################################
+data <- data.frame(mort,time,t,AH1P,AH3,B,pop)
+##########################################################################################
+Poimod <- glm(mort ~ time + time^2 + time^3 + sin(t) + cos(t) + AH1P + AH3 + 
+                B + offset(log(pop)), data = data,family = poisson(link = 'log'))
+
+dataflu0 <- data.frame(mort,time,t,AH1P=AH1P*0,AH3=AH3*0,B=B*0,pop)
+mortflu0 <- predict(Poimod, newdata = dataflu0, type = 'response')
+
+EM <- sum(mort - mortflu0)
+##########################################################################################
+```
+In this case, the total number of excess dearhs in people 65 and older due to influenza over six seasons is estimated at $`r round(EM)`$. 
+
+### Updated models for RSV or influenza/RSV mortality
+
+To account for a baseline mortality function that is not exactly sinusoidal, regression splines can be used. To model influenza mortality, 
+
+# References

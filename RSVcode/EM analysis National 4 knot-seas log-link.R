@@ -16,6 +16,9 @@ variables7 <- c('EMRSV1tot','EMRSV2tot','EMRSV3tot','EMRSV4tot','EMRSV5tot','EMR
                 'EMflu1tot','EMflu2tot','EMflu3tot','EMflu4tot','EMflu5tot','EMflu6tot','EMflutot')
 # variables7 <- c('b0','b[1:31]','b10','b11','b12','b20','b21','b22')
 ###################################################################################################
+nadapt <- 5000
+niter <- 20000
+
 for (ag in rev(1:5)){
   agdata <- datarr[which(datarr$age==ag),]
   RSV <- agdata$RSV
