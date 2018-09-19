@@ -1,6 +1,6 @@
 ###############################################################################
 ###############################################################################
-###  Ivo M. Foppa, Aug 2018---National RSV excess mort. analysis          #####
+###  Ivo M. Foppa, Sep 2018---National RSV excess mort. analysis          #####
 ###############################################################################
 ###############################################################################
 # setwd('C:/Users/VOR1/Documents/Git projects/RSV_Excess_Mortality')
@@ -28,7 +28,7 @@ for (ag in rev(1:5)){
   ndf <- round((nknots + 1) * nseas/(nseas*52.5)*N)
   nsarr <- ns(time,df = ndf)[,]  ## defining basis matrix
   ###################################################################################################
-  mod <- lm(log(mort/pop) ~ ns(time, df = ndf))
+  mod <- lm(mort/pop ~ ns(time, df = ndf))
   smod <- summary(mod)
   coeffls <- as.numeric(smod$coefficients[,1])
   nsinit <- coeffls[2:(ndf + 1)]
@@ -57,7 +57,7 @@ for (ag in rev(1:5)){
   setwd('..')
   setwd('./RSVmodels')
   
-  j.model <- jags.model(file=model3.file,data=data, inits=inits, n.adapt=nadapt, n.chains=3)
+  j.model <- jags.model(file=model1.file,data=data, inits=inits, n.adapt=nadapt, n.chains=3)
   j.samples<-coda.samples(j.model, variable.names=variables7, n.iter=niter, thin = 5) 
   
   codaarr <- rbind(j.samples[[1]],j.samples[[2]],j.samples[[3]],deparse.level=0)
@@ -65,7 +65,7 @@ for (ag in rev(1:5)){
   
   setwd('..')
   setwd('./RSVMCMCoutput')
-  fname <- paste0('codaarr',ag,' RSV ',qual3,' ',nknots,' knots ps ',nadapt,' ',round(niter/5*3),'.RData')
+  fname <- paste0('codaarr',ag,' RSV ',qual1,' ',nknots,' knots ps ',nadapt,' ',round(niter/5*3),'.RData')
   save(codaarr,file = fname)
   
   cat(paste0('\nAge group ',ag,': done\n'))
