@@ -239,8 +239,10 @@ fluci <- prettyNum(fluci)
 ```
 Using the identity-link version of the above model, for age group 65+, from the season 2010/11 through 2015/16, the number of excess deaths due to influenza are estimated at `r paste0(fluci[1],' (',fluci[2],',',fluci[3],')')`, while deaths due to RSV are estimated at `r paste0(RSVci[1],' (',RSVci[2],',',RSVci[3],')')`, roughly 3 times as many. 
 
+Even though the results from these ecological analyses are guesses, which rely on certain assumptions, such high numbers of RSV excess mortality are quite implausible. I believe that this is a result of the strong  colinearilty between the RSV indicator and RC mortality (correlation coefficient , 
+p-value $< 0.00001$)
 \clearpage
-```{r fig1,eval=TRUE,fig.pos='ht',echo=FALSE,fig.width=6,fig.height=4}
+```{r fig1,eval=TRUE,fig.pos='ht',echo=FALSE,fig.width=8,fig.height=6}
 filename <- paste0('data_National_2010_16_5ag.dat')
 setwd('..')
 setwd("./RSVdata")
@@ -252,9 +254,14 @@ rcu <- datarr5$rcu
 RSV <- datarr5$RSV
 rsvstd <- RSV/(max(RSV))*max(rcu - min(rcu)) + min(rcu)
 
-plot(rcu,ylim = c(0,max(rcu)),ylab = '# of Deaths',xlab = 'index Week')
+H3 <- datarr5$AH3
+H3std <- H3/(max(H3))*max(rcu - min(rcu)) + min(rcu)
+
+plot(rcu,ylim = c(min(rcu),max(rcu)),ylab = '# of Deaths',xlab = 'index Week')
 lines(rsvstd,col = 'red',lwd = 2)
-legend('bottom',c('RC Deaths ','RSV Indicator (norm.)'), lty = c(NA,1), lwd = c(NA,2),col = c('black','red'),pch = c(1,NA) ,bty = 'n')
+lines(H3std,col = 'blue',lwd = 2)
+legend('topleft',c('RC Deaths ','RSV Indicator (norm.)','A(H3N2) Indicator (norm.)'), lty = c(NA,1,1), lwd = c(NA,2,2),col = c('black','red','blue'),pch = c(1,NA) ,bty = 'n')
+
 
 ```
 
