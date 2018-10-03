@@ -19,14 +19,14 @@ This is a summary of the methods used for influenza excess mortality estimation 
 
 Traditionally, weekly influenza excess mortality was estimating using the following model.  This model @thompson2009estimates is sometimes referred to as ``Serfling-type'' model, in reference to Robert Serfling who used a Fourier series to estimate the baseline mortality function @serfling1963methods:
 
-//begin{eqnarray}
-//label{eq:mod_trad}
-//log //mu_k &=& //beta_0 + //beta_1 w_k  + //beta_2 w_k^2  + //beta_3 w_k^3  + //beta_4 //sin t_k  + //beta_5 //cos t_k + 
-//beta_6 AH1P + //beta_7 AH3  + //beta_8 B////
-//label{eq:dist1}
-y_k &//sim& //operatorname{Poi}(//mu_k //; N_k)
-//end{eqnarray}
-where $t_k = //frac{w_k //; 2//pi}{52.25}$, with $w_k$ being the index week, and $AH1P$,$AH3$ and $B$ are the viral surveillance indicators for influenza, typically the percent of samples tested with positive test results for influenza A(H3N2), A(H1N1)pdm09 and B, respectively, $y_k$ is the number of deaths (e.g. respiratory and circulatory deaths, usually by age group) in week $k$ and $N_k$ is the population denominator.  In R, this model could be implemented as follows.  We look at data over six influenza seasons; the influenza indicators are actually the proportion positive multiplied by the ILI//%.  This type of indicator is sometimes referred to as Goldstein indicator (see @goldstein2011predicting): 
+\begin{eqnarray}
+\label{eq:mod_trad}
+\log \mu_k &=& \beta_0 + \beta_1 w_k  + \beta_2 w_k^2  + \beta_3 w_k^3  + \beta_4 \sin t_k  + \beta_5 \cos t_k + 
+\beta_6 AH1P + \beta_7 AH3  + \beta_8 B\\
+\label{eq:dist1}
+y_k &\sim& \operatorname{Poi}(\mu_k \; N_k)
+\end{eqnarray}
+where $t_k = \frac{w_k \; 2\pi}{52.25}$, with $w_k$ being the index week, and $AH1P$,$AH3$ and $B$ are the viral surveillance indicators for influenza, typically the percent of samples tested with positive test results for influenza A(H3N2), A(H1N1)pdm09 and B, respectively, $y_k$ is the number of deaths (e.g. respiratory and circulatory deaths, usually by age group) in week $k$ and $N_k$ is the population denominator.  In R, this model could be implemented as follows.  We look at data over six influenza seasons; the influenza indicators are actually the proportion positive multiplied by the ILI\%.  This type of indicator is sometimes referred to as Goldstein indicator (see @goldstein2011predicting): 
 
 ```{r echo=T,eval=T}
 filename <- 'data_National_2010_16_5ag.dat'
@@ -61,18 +61,18 @@ mortflu0 <- predict(Poimod, newdata = dataflu0, type = 'response')
 EM <- sum(mort - mortflu0)
 ##########################################################################################
 ```
-In this case, the total number of excess dearhs in people 65 and older due to influenza over six seasons is estimated at $`r round(EM)`$. Confidence intervals for this estimate can be obtained using bootstrapping or implementing the model in a Bayesian framework (using flat priors).
+In this case, the total number of excess dearhs in people 65 and older due to influenza over six seasons is estimated at $`r round(EM,digits=2)`$. Confidence intervals for this estimate can be obtained using bootstrapping or implementing the model in a Bayesian framework (using flat priors).
 
 ### Updated models for RSV or influenza/RSV mortality
 
 To account for a baseline mortality function that is not exactly sinusoidal, regression splines can be used. To model influenza mortality, we have been including, in additional to the influenza indicators, also an RSV indicator. We have been using influenza and RSV indicators that are lagged by 0, 1 and 2 weeks. Here is the resulting Poisson model:
 
-//begin{equation}
-//log(//mu_k) = //beta_0 + //sum_{m=1}^{M} //alpha_m B_{k,m} + //sum_{l=0}^2 //beta_{1l} AH1P_l 
-+ //sum_{l=0}^2 //beta_{2l} AH3_l  + //sum_{l=0}^2 //beta_{3l} B_l + //sum_{l=0}^2 //beta_{4l} RSV_l
-//end{equation},
+\begin{equation}
+\log(\mu_k) = \beta_0 + \sum_{m=1}^{M} \alpha_m B_{k,m} + \sum_{l=0}^2 \beta_{1l} AH1P_l 
++ \sum_{l=0}^2 \beta_{2l} AH3_l  + \sum_{l=0}^2 \beta_{3l} B_l + \sum_{l=0}^2 \beta_{4l} RSV_l
+\end{equation},
 
-where $M$ is the number of knots, $B$ is the basis matrix and $AH1P_l,AH3_l,B_l //text{ and } RSV_l$ are the influenza and RSV indicators lagged by $l$ week(s). Instead of a Poisson model, a negative binomial model can be used. We fit this model using Markov chain Monte Carlo (MCMC) methods (Bayesian framework).  Here, the goal is influenza excess mortality estimation:
+where $M$ is the number of knots, $B$ is the basis matrix and $AH1P_l,AH3_l,B_l \text{ and } RSV_l$ are the influenza and RSV indicators lagged by $l$ week(s). Instead of a Poisson model, a negative binomial model can be used. We fit this model using Markov chain Monte Carlo (MCMC) methods (Bayesian framework).  Here, the goal is influenza excess mortality estimation:
 
 ```{r echo=T,eval=F}
 ##########################################################################################
@@ -146,8 +146,9 @@ for (ag in rev(1:5)){
 ##########################################################################################
 ```
 
-Instead of virologic surveillance indicators for influenza circulation we have used coded influenza mortality of the age group the analysis is conducted in.  In that case, coded influenza mortality has to be subtracted from the outcome count and added to the resulting excess mortality estimate. We usually use identity=link models, because of the the component causes of mortality are additive (total mortality = baseline mortality + excess mortality)
+Instead of virologic surveillance indicators for influenza circulation we have used coded influenza mortality of the age group the analysis is conducted in.  In that case, coded influenza mortality has to be subtracted from the outcome count and added to the resulting excess mortality estimate. We usually use identity-link models, because of the the component causes of mortality are additive (total mortality = baseline mortality + excess mortality)
 The resulting model: 
+
 ```
 model {
   for(l in 1:2){
@@ -214,7 +215,7 @@ model {
 #### RSV excess mortality
 As excess mortality is a function of the model parameters, it appears that this model could be used, exchangeably, for influenza and RSV excess mortality estimation. 
 
-```{r echo=F,eval=T}
+```{r echo=F,eval=T,message=F}
 setwd('../')
 setwd('./RSVcode')
 source('Set_environmental_variables.R')
@@ -232,7 +233,30 @@ fluEM <- codaarr$EMflutot
 
 RSVci <- round(as.numeric(quantile(RSVEM, probs = c(.5,.025,.975))))
 fluci <- round(as.numeric(quantile(fluEM, probs = c(.5,.025,.975))))
+RSVci <- prettyNum(RSVci)
+fluci <- prettyNum(fluci)
+
 ```
 Using the identity-link version of the above model, for age group 65+, from the season 2010/11 through 2015/16, the number of excess deaths due to influenza are estimated at `r paste0(fluci[1],' (',fluci[2],',',fluci[3],')')`, while deaths due to RSV are estimated at `r paste0(RSVci[1],' (',RSVci[2],',',RSVci[3],')')`, roughly 3 times as many. 
+
+\clearpage
+```{r fig1,eval=TRUE,fig.pos='ht',echo=FALSE,fig.width=6,fig.height=4}
+filename <- paste0('data_National_2010_16_5ag.dat')
+setwd('..')
+setwd("./RSVdata")
+
+datarr <- read.table(file = filename, header = T)
+datarr5 <- datarr[which(datarr$age==5),]
+
+rcu <- datarr5$rcu
+RSV <- datarr5$RSV
+rsvstd <- RSV/(max(RSV))*max(rcu - min(rcu)) + min(rcu)
+
+plot(rcu,ylim = c(0,max(rcu)),ylab = '# of Deaths',xlab = 'index Week')
+lines(rsvstd,col = 'red',lwd = 2)
+legend('bottom',c('RC Deaths ','RSV Indicator (norm.)'), lty = c(NA,1), lwd = c(NA,2),col = c('black','red'),pch = c(1,NA) ,bty = 'n')
+
+```
+
 
 # References
